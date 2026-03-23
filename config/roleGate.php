@@ -5,22 +5,25 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+require_once 'config.php';
+
 // Define redirect URLs for each role
 $_SESSION['redirect_urls'] = [
-    'staff'   => 'http://localhost/JAM_Lyingin/dashboard.php',
-    'admin'   => 'http://localhost/JAM_Lyingin/dashboard.php', // Admins now share staff dashboard
-    'patient' => 'http://localhost/JAM_Lyingin/pdash.php',
-    'clerk'   => 'http://localhost/JAM_Lyingin/clerkdash.php',
-    'default' => 'http://localhost/JAM_Lyingin/front.php'
+    'staff' => URL_DASH_STAFF,
+    'admin' => URL_DASH_STAFF,
+    'patient' => URL_DASH_PATIENT,
+    'clerk' => URL_DASH_CLERK,
+    'default' => URL_FRONT
 ];
 
 // Log access attempts
-function logAccess($message) {
+function logAccess($message)
+{
     $timestamp = date('Y-m-d H:i:s');
-    $ip        = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
-    $user      = $_SESSION['user_email'] ?? 'guest';
-    $role      = $_SESSION['user_role'] ?? 'none';
-    $page      = $_SERVER['REQUEST_URI'] ?? 'unknown';
+    $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+    $user = $_SESSION['user_email'] ?? 'guest';
+    $role = $_SESSION['user_role'] ?? 'none';
+    $page = $_SERVER['REQUEST_URI'] ?? 'unknown';
 
     $entry = "[$timestamp] IP: $ip | User: $user | Role: $role | Page: $page | $message\n";
 
@@ -29,9 +32,10 @@ function logAccess($message) {
 }
 
 // Role-based access guard
-function requireRole(array $allowedRoles) {
+function requireRole(array $allowedRoles)
+{
     $actualRole = $_SESSION['user_role'] ?? null;
-    $urls       = $_SESSION['redirect_urls'] ?? [];
+    $urls = $_SESSION['redirect_urls'] ?? [];
 
     if (!$actualRole) {
         logAccess("No role detected. Redirecting to front.php");

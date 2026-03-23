@@ -1,7 +1,8 @@
 <?php
 // Tester for submit_appointment_request.php
 //Lol pota di pa nagana tester. Yung main ang gumagana HAHAHAHAHA
-$endpoint = 'http://localhost/JAM_LYINGIN/auth/action/submit_appointment_request.php'; // Adjust path if needed
+require_once __DIR__ . '/../config/url.php';
+$endpoint = BASE_URL . 'auth/action/submit_appointment_request.php'; // Adjust path if needed
 
 // Simulated form data
 $postData = [

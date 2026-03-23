@@ -1,8 +1,9 @@
 <?php
 include_once __DIR__ . '/../config/config.php';
+include_once __DIR__ . '/../config/url.php';
 
 // Simulate a POST request to the medical history submission endpoint
-$url = 'http://localhost/JAM_LYINGIN/auth/action/submit_medical_history.php'; // Adjust path as needed
+$url = BASE_URL . 'auth/action/submit_medical_history.php'; // Adjust path as needed
 
 $data = [
     'patient_id' => 1,

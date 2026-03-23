@@ -57,12 +57,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($result['status'] === 'success') {
         // ✅ Redirect to finalize registration
-        header("Location: action/finalize_signup.php");
+        header("Location: " . BASE_PATH . "/auth/action/finalize_signup.php");
         exit;
     } else {
         // ❌ Show error message
         echo "<p style='color:red;'>OTP Error: " . htmlspecialchars($result['message']) . "</p>";
-        echo "<a href='../otp_page.php'>Try Again</a>";
+        echo "<a href='" . BASE_PATH . "/otp_page.php'>Try Again</a>";
     }
 }
 ?>

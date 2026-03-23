@@ -1,10 +1,11 @@
 <?php
+require_once __DIR__ . '/../config/url.php';
 
 // Set the target patient ID for testing
 $testPatientId = 4;
 $_SESSION['user_role'] = 'admin'; // Simulate clerk role
 // Build the request URL
-$url = "http://localhost/JAM_LYINGIN/auth/action/clerk/clerk_get_services_by_patient.php?patient_id=" . urlencode($testPatientId);
+$url = BASE_URL . "auth/action/clerk/clerk_get_services_by_patient.php?patient_id=" . urlencode($testPatientId);
 
 // Initialize cURL
 $ch = curl_init($url);

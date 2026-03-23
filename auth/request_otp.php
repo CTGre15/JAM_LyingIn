@@ -80,12 +80,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($result['status'] === 'success') {
     $_SESSION['pending_user']['otp'] = $result['otp'];       // ✅ Store OTP if needed
     $_SESSION['pending_user']['otp_id'] = $pdo->lastInsertId(); // ✅ Store OTP ID
-    header("Location: otp_page.php");
+    header("Location: " . BASE_PATH . "/auth/otp_page.php");
     exit;
     }
 
     if ($result['status'] === 'success') {
-        header("Location: otp_page.php");
+        header("Location: " . BASE_PATH . "/auth/otp_page.php");
         exit;
     } else {
         echo "OTP Error: " . $result['message'];

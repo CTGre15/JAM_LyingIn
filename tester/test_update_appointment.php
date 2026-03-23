@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../config/url.php'; ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -52,7 +53,7 @@
       const status = document.getElementById('status').value;
       const resultDiv = document.getElementById('result');
 
-      fetch('http://localhost/JAM_Lyingin/auth/action/staff/staff_update_appointment_status.php', {
+      fetch('<?= BASE_URL ?>auth/action/staff/staff_update_appointment_status.php', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

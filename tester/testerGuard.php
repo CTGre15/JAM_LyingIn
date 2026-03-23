@@ -1,5 +1,6 @@
 <?php
 // config/testerGuard.php
+require_once __DIR__ . '/../config/config.php';
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -7,10 +8,10 @@ if (session_status() === PHP_SESSION_NONE) {
 
 // Define redirect URLs
 $_SESSION['redirect_urls'] = [
-    'staff'   => '/JAM_Lyingin/dashboard.php',
-    'patient' => '/JAM_Lyingin/pdash.php',
-    'clerk'   => '/JAM_Lyingin/clerkdash.php',
-    'default' => '/JAM_Lyingin/front.php'
+    'staff'   => URL_DASH_STAFF,
+    'patient' => URL_DASH_PATIENT,
+    'clerk'   => URL_DASH_CLERK,
+    'default' => URL_FRONT
 ];
 
 /**

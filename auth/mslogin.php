@@ -262,7 +262,7 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_role'] === 'staff') {
             </form>
 
             <div style="margin-top: 20px; text-align: center;">
-                <a href="../front.php" class="btn" style="background: #f0f0f0; color: #333; text-decoration: none; display: inline-block; padding: 15px; border-radius: 8px; width: 100%; box-sizing: border-box;">Back to Home</a>
+                <a href= "<?= URL_FRONT ?>" class="btn" style="background: #f0f0f0; color: #333; text-decoration: none; display: inline-block; padding: 15px; border-radius: 8px; width: 100%; box-sizing: border-box;">Back to Home</a>
             </div>
         </div>
 

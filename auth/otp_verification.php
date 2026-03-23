@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once __DIR__ . '/../config/config.php';
 
 $error_message = '';
 $success_message = '';
@@ -24,16 +25,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['verify_otp'])) {
             // Redirect to appropriate dashboard based on user role
             if (isset($_SESSION['user_role'])) {
                 if ($_SESSION['user_role'] == 'patient') {
-                    header('Location: pdash.php');
+                    header('Location: ' . URL_DASH_PATIENT);
                 } elseif ($_SESSION['user_role'] == 'medical_staff') {
-                    header('Location: mwdash.php');
+                    header('Location: ' . URL_DASH_STAFF);
                 } elseif ($_SESSION['user_role'] == 'clerk') {
-                    header('Location: clerkdash.php');
+                    header('Location: ' . URL_DASH_CLERK);
                 } else {
-                    header('Location: dashboard.php');
+                    header('Location: ' . URL_DASH_STAFF);
                 }
             } else {
-                header('Location: dashboard.php');
+                header('Location: ' . URL_DASH_STAFF);
             }
             exit();
         } else {
@@ -68,10 +69,10 @@ if (!isset($_SESSION['otp_phone']) && isset($_GET['phone'])) {
 </head>
 <body>
     <nav class="navbar">
-        <a href="front.html" class="navbar-brand">JAM Lying-In Clinic</a>
+        <a href="<?= URL_FRONT ?>" class="navbar-brand">JAM Lying-In Clinic</a>
         <ul class="navbar-nav"> 
-            <li class="nav-item"><a href="mslogin.php" class="nav-link">Medical Staff</a></li>
-            <li class="nav-item"><a href="login.php?role=patient" class="nav-link">Patient Sign In</a></li>
+            <li class="nav-item"><a href="<?= BASE_PATH ?>/auth/mslogin.php" class="nav-link">Medical Staff</a></li>
+            <li class="nav-item"><a href="<?= URL_LOGIN_PATIENT ?>" class="nav-link">Patient Sign In</a></li>
         </ul>
     </nav>
 
@@ -112,7 +113,7 @@ if (!isset($_SESSION['otp_phone']) && isset($_GET['phone'])) {
             </div>
 
             <div class="back-section">
-                <a href="login.php" class="back-link">← Back to Login</a>
+                <a href="<?= BASE_PATH ?>/auth/login.php" class="back-link">← Back to Login</a>
             </div>
         </div>
 

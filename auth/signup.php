@@ -209,7 +209,7 @@ if (isset($_SESSION['user_id'])) {
                 <div class="alert alert-success"><?php echo $success_message; ?></div>
             <?php endif; ?>
 
-            <form method="POST" action="request_otp.php">
+            <form method="POST" action="<?= BASE_PATH ?>/auth/request_otp.php">
             <div class="form-group">
                 <label for="first_name">First Name</label>
                 <input type="text" id="first_name" name="first_name" required>
@@ -247,11 +247,11 @@ if (isset($_SESSION['user_id'])) {
             </form>
 
             <div class="toggle-form">
-                Already have an account? <a href="login.php">Login here</a>
+                Already have an account? <a href="<?= URL_LOGIN_PATIENT ?>">Login here</a>
             </div>
 
             <div style="margin-top: 20px; text-align: center;">
-                <a href="../front.php" class="btn" style="background: #f0f0f0; color: #333; text-decoration: none; display: inline-block; padding: 15px; border-radius: 8px; width: 100%; box-sizing: border-box;">Back to Home</a>
+                <a href="<?= URL_FRONT ?>" class="btn" style="background: #f0f0f0; color: #333; text-decoration: none; display: inline-block; padding: 15px; border-radius: 8px; width: 100%; box-sizing: border-box;">Back to Home</a>
             </div>
         </div>
 

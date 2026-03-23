@@ -2,6 +2,7 @@
 
 session_start();
 include_once 'config/config.php';
+include_once 'config/url.php';
 include_once 'config/roleGate.php';
 requireRole(['staff', 'admin']);
 header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
@@ -263,6 +264,9 @@ file_put_contents(__DIR__ . '/debug.txt', "RAW POST ID ITO: " . file_get_content
     <link rel="stylesheet" href="docdash.css">
 </head>
 <body>
+<script>
+const staffApiBaseUrl = '<?= BASE_URL ?>auth/action/staff/';
+</script>
    <script>console.log("Fetched literally ID: <?= $_SESSION['currentPage']; ?>");</script>
  
     <div class="sidebar">
@@ -350,7 +354,7 @@ function fetchApprovedAppointments() {
   errorBlock.style.display = 'none';
   tableBody.innerHTML = '';
 
-  fetch('http://localhost/JAM_LYINGIN/auth/action/staff/staff_get_approved_appointments.php')
+  fetch(staffApiBaseUrl + 'staff_get_approved_appointments.php')
     .then(res => res.json())
     .then(data => {
       loader.style.display = 'none';
@@ -444,7 +448,7 @@ function fetchApprovedAppointments() {
 
 function updateAppointmentStatus(appointmentId, newStatus) {
   console.log("ASFFJAJASF YOU REACHED ME")
-  fetch('http://localhost/JAM_LYINGIN/auth/action/staff/staff_update_appointment_status.php', {
+  fetch(staffApiBaseUrl + 'staff_update_appointment_status.php', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -1052,7 +1056,7 @@ document.addEventListener('DOMContentLoaded', function () {
                               const formData = new FormData(this);
                               const payload = Object.fromEntries(formData.entries());
 
-                              fetch('http://localhost/JAM_LYINGIN/auth/action/staff/staff_set_patient_pregnancy_tracker.php', {
+                              fetch(staffApiBaseUrl + 'staff_set_patient_pregnancy_tracker.php', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify(payload)
@@ -1076,7 +1080,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             function loadPregnancyTracker() {
                               const patientId = <?= htmlspecialchars(PatientRecord::$id) ?>;
 
-                              fetch(`http://localhost/JAM_LYINGIN/auth/action/staff/staff_get_patient_pregnancy_tracker.php?patient_id=${patientId}`)
+                              fetch(`${staffApiBaseUrl}staff_get_patient_pregnancy_tracker.php?patient_id=${patientId}`)
                                 .then(res => res.json())
                                 .then(data => {
                                   if (data.status === 'success') {

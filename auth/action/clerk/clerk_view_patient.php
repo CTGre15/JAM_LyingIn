@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once(__DIR__ . '/../../../config/config.php');
+require_once(__DIR__ . '/../../../config/url.php');
 
 $patientId = $_SESSION['selectedPatientId'] ?? 0;
 
@@ -101,13 +102,13 @@ if (!$patient) {
     <h2>Patient Profile</h2>
 
     <div style="position: absolute; top: 16px; right: 32px; z-index: 10;">
-      <button onclick="window.location.href='/JAM_Lyingin/clerkdash.php#patients'" style="padding: 10px 20px; background-color: #C97DBE; color: white; border: none; border-radius: 5px; cursor: pointer;">Back
+      <button onclick="window.location.href='<?= BASE_PATH ?>/clerkdash.php#patients'" style="padding: 10px 20px; background-color: #C97DBE; color: white; border: none; border-radius: 5px; cursor: pointer;">Back
       </button>
     </div>
 
     <div class="profile-header">
       <?php if (!empty($patient['patient_image'])): ?>
-        <img src="/uploads/patients/<?= htmlspecialchars($patient['patient_image']) ?>" alt="Patient Image">
+        <img src="<?= BASE_PATH ?>/uploads/patients/<?= htmlspecialchars($patient['patient_image']) ?>" alt="Patient Image">
       <?php else: ?>
         <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDEyMCAxMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIGZpbGw9IiNmOGY5ZmUiLz48Y2lyY2xlIGN4PSI2MCIgY3k9IjQ2IiByPSIzMiIgZmlsbD0iI2ZlZWNmZiIvPjxyZWN0IHg9IjM2IiB5PSI4MiIgd2lkdGg9IjQ4IiBoZWlnaHQ9IjI4IiByeD0iMTQiIGZpbGw9IiNlMmU4ZjAiLz48L3N2Zz4=" alt="Default Avatar">
       <?php endif; ?>

@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once __DIR__ . '/../config/config.php';
 $_SESSION['patient_id'] = 1; // Replace with a valid patient ID from your DB
 ?>
 
@@ -33,7 +34,7 @@ $_SESSION['patient_id'] = 1; // Replace with a valid patient ID from your DB
 
   <h2>Test VAW Risk Assessment Submission</h2>
 
-  <form action="/JAM_LYINGIN/auth/action/submit_vaw_risk_assessment.php" method="POST">
+  <form action="<?= BASE_PATH ?>/auth/action/submit_vaw_risk_assessment.php" method="POST">
     <input type="hidden" name="visit_date" value="2025-10-15">
 
     <div class="checkbox-group">

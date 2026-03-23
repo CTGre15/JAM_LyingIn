@@ -1,7 +1,7 @@
 <?php
 session_start();
-require_once '../config/config.php';
 require_once '../url.php';
+require_once '../config/config.php';
 
 $error_message = '';
 $success_message = '';
@@ -35,12 +35,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
 
             // Redirect based on role
             $redirects = [
-                'staff'   => '/JAM_Lyingin/docdash.php',
-                'patient' => '/JAM_Lyingin/pdash.php',
-                'clerk'   => '/JAM_Lyingin/clerkdash.php',
-                'admin'   => '/JAM_Lyingin/dashboard.php',
-                'default' => '/JAM_Lyingin/front.php'
-            ];
+    'staff'   => URL_DASH_STAFF,
+    'patient' => URL_DASH_PATIENT,
+    'clerk'   => URL_DASH_CLERK,
+    'admin'   => URL_DASH_ADMIN,
+    'default' => URL_FRONT
+];
 
             $role = $_SESSION['user_role'];
             $target = $redirects[$role] ?? $redirects['default'];
@@ -56,12 +56,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
 // Optional: prevent logged-in users from accessing login page again
 if (!empty($_SESSION['user_id']) && !empty($_SESSION['user_role']) && $_SERVER['REQUEST_METHOD'] !== 'POST') {
     $redirects = [
-        'staff'   => '/JAM_Lyingin/dashboard.php',
-        'patient' => '/JAM_Lyingin/pdash.php',
-        'clerk'   => '/JAM_Lyingin/clerkdash.php',
-        'admin'   => '/JAM_Lyingin/mwadmin.php',
-        'default' => '/JAM_Lyingin/front.php'
-    ];
+    'staff'   => URL_DASH_STAFF,
+    'patient' => URL_DASH_PATIENT,
+    'clerk'   => URL_DASH_CLERK,
+    'admin'   => URL_DASH_ADMIN,
+    'default' => URL_FRONT
+];
     $role = $_SESSION['user_role'];
     $target = $redirects[$role] ?? $redirects['default'];
     header("Location: $target");
@@ -274,7 +274,7 @@ if (!empty($_SESSION['user_id']) && !empty($_SESSION['user_role']) && $_SERVER['
             </form>
 
             <div style="margin-top: 20px; text-align: center;">
-                <a href="../front.php" class="btn" style="background: #f0f0f0; color: #333; text-decoration: none; display: inline-block; padding: 15px; border-radius: 8px; width: 100%; box-sizing: border-box;">Back to Home</a>
+                <a href="<?= URL_FRONT ?>" class="btn" style="background: #f0f0f0; color: #333; text-decoration: none; display: inline-block; padding: 15px; border-radius: 8px; width: 100%; box-sizing: border-box;">Back to Home</a>
             </div>
         </div>
 

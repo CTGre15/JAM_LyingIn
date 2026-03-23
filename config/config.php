@@ -3,6 +3,63 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// Base path
+if (!defined('BASE_PATH')) {
+    $projectRoot = realpath(__DIR__ . '/..');
+    $documentRoot = isset($_SERVER['DOCUMENT_ROOT']) ? realpath($_SERVER['DOCUMENT_ROOT']) : false;
+    $resolvedBasePath = '';
+
+    if ($projectRoot && $documentRoot) {
+        $normalizedProjectRoot = str_replace('\\', '/', $projectRoot);
+        $normalizedDocumentRoot = rtrim(str_replace('\\', '/', $documentRoot), '/');
+
+        if (strpos($normalizedProjectRoot, $normalizedDocumentRoot) === 0) {
+            $resolvedBasePath = substr($normalizedProjectRoot, strlen($normalizedDocumentRoot));
+        }
+    }
+
+    if ($resolvedBasePath === false || $resolvedBasePath === null) {
+        $resolvedBasePath = '';
+    }
+
+    $resolvedBasePath = '/' . trim((string) $resolvedBasePath, '/');
+
+    define('BASE_PATH', $resolvedBasePath === '/' ? '' : $resolvedBasePath);
+}
+
+// URL constants
+if (!defined('BASE_PATH')) {
+    define('BASE_PATH', '');
+}
+
+if (!defined('URL_FRONT')) {
+    define('URL_FRONT', BASE_PATH . '/front.php');
+}
+
+if (!defined('URL_DASH_STAFF')) {
+    define('URL_DASH_STAFF', BASE_PATH . '/dashboard.php');
+}
+
+if (!defined('URL_DASH_PATIENT')) {
+    define('URL_DASH_PATIENT', BASE_PATH . '/pdash.php');
+}
+
+if (!defined('URL_DASH_CLERK')) {
+    define('URL_DASH_CLERK', BASE_PATH . '/clerkdash.php');
+}
+
+if (!defined('URL_DASH_ADMIN')) {
+    define('URL_DASH_ADMIN', BASE_PATH . '/mwadmin.php');
+}
+
+if (!defined('URL_SIGNUP')) {
+    define('URL_SIGNUP', BASE_PATH . '/auth/signup.php');
+}
+
+if (!defined('URL_LOGIN_PATIENT')) {
+    define('URL_LOGIN_PATIENT', BASE_PATH . '/auth/login.php?role=patient');
+}
+
 // Database configuration
 $host = 'localhost';
 $dbname = 'jam_db';

@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../config/url.php';
 // Simulate staff role
 $_SESSION['user_role'] = 'staff';
 
@@ -11,7 +12,7 @@ $testPayload = [
 ];
 
 // Build request
-$url = "http://localhost/JAM_LYINGIN/auth/action/staff/staff_set_patient_pregnancy_tracker.php";
+$url = BASE_URL . "auth/action/staff/staff_set_patient_pregnancy_tracker.php";
 $ch = curl_init($url);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_POST, true);

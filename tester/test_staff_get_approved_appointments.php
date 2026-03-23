@@ -1,10 +1,11 @@
 <?php
+require_once __DIR__ . '/../config/url.php';
 // Simulate staff role and user ID
 $testStaffId = 8;
 $_SESSION['user_role'] = 'staff';
 
 // Build the request URL
-$url = "http://localhost/JAM_LYINGIN/auth/action/staff/staff_get_approved_appointments.php";
+$url = BASE_URL . "auth/action/staff/staff_get_approved_appointments.php";
 
 // Initialize cURL
 $ch = curl_init($url);

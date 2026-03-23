@@ -2,6 +2,7 @@
 
 session_start();
 include_once 'config/config.php'; // Ensure $pdo is available
+include_once 'config/url.php';
 include_once 'config/roleGate.php';
 requireRole(['clerk']);
 if (!isset($_SESSION['clerk_name'])) {
@@ -1427,6 +1428,9 @@ if (isset($_GET['calendar_ajax']) && isset($_GET['year']) && isset($_GET['month'
     -->
 </head>
 <body>
+    <script>
+    const clerkApiBaseUrl = '<?= BASE_URL ?>auth/action/clerk/';
+    </script>
     <div class="sidebar">
         <div class="logo">JAM Lying-in Clinic</div>
         
@@ -1577,8 +1581,8 @@ foreach ($grouped as $doctorName => $doctorAppointments):
                          </div>
                      </div>
                         <script>
-                        const getPendingAppointmentsURL = 'http://localhost/JAM_LYINGIN/auth/action/clerk/clerk_get_pending_appointments.php';
-                        const approveAppointmentURL = 'http://localhost/JAM_LYINGIN/auth/action/clerk/clerk_approve_appointments.php';
+                        const getPendingAppointmentsURL = clerkApiBaseUrl + 'clerk_get_pending_appointments.php';
+                        const approveAppointmentURL = clerkApiBaseUrl + 'clerk_approve_appointments.php';
 
                         document.addEventListener('DOMContentLoaded', () => {
                         const container = document.getElementById('pending-appointments-container');
@@ -1759,9 +1763,9 @@ foreach ($grouped as $doctorName => $doctorAppointments):
         </div>
         
         <script>
-        const getClerkPatientsURL = 'http://localhost/JAM_LYINGIN/auth/action/clerk/clerk_get_patients.php';
-        const getStatusListURL = 'http://localhost/JAM_LYINGIN/auth/action/clerk/clerk_get_status_list.php';
-        const setPatientStatusURL = 'http://localhost/JAM_LYINGIN/auth/action/clerk/clerk_set_patient_status.php';
+        const getClerkPatientsURL = clerkApiBaseUrl + 'clerk_get_patients.php';
+        const getStatusListURL = clerkApiBaseUrl + 'clerk_get_status_list.php';
+        const setPatientStatusURL = clerkApiBaseUrl + 'clerk_set_patient_status.php';
 
         document.addEventListener('DOMContentLoaded', () => {
         const tableBody = document.getElementById('patient-table-body');
@@ -2304,7 +2308,7 @@ foreach ($grouped as $doctorName => $doctorAppointments):
                             return;
                         }
 
-                        fetch('http://localhost/JAM_LYINGIN/auth/action/clerk/clerk_change_password.php', {
+                        fetch(clerkApiBaseUrl + 'clerk_change_password.php', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             credentials: 'same-origin',
@@ -2407,7 +2411,7 @@ function submitBill() {
     amount: amount
   };
 
-  fetch('http://localhost/JAM_LYINGIN/auth/action/clerk/clerk_set_bill_transact.php', {
+  fetch(clerkApiBaseUrl + 'clerk_set_bill_transact.php', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)
@@ -2472,7 +2476,7 @@ function loadBillingTransactions(patientId) {
   const tbody = document.getElementById('billingTransactionTable');
   tbody.innerHTML = `<tr><td colspan="4" style="padding:10px; color:#6b7280;">Loading...</td></tr>`;
 
-  fetch(`http://localhost/JAM_LYINGIN/auth/action/clerk/clerk_get_bill_transact.php?patient_id=${patientId}`)
+  fetch(`${clerkApiBaseUrl}clerk_get_bill_transact.php?patient_id=${patientId}`)
     .then(res => res.json())
     .then(data => {
       tbody.innerHTML = '';
@@ -2504,7 +2508,7 @@ function loadBillingTransactions(patientId) {
 
 // Refresh balance box
 function refreshBalance(patientId) {
-  fetch(`http://localhost/JAM_LYINGIN/auth/action/clerk/clerk_get_balance.php?patient_id=${patientId}`)
+  fetch(`${clerkApiBaseUrl}clerk_get_balance.php?patient_id=${patientId}`)
     .then(res => res.json())
     .then(data => {
       if (data.status === 'success') {
@@ -2518,7 +2522,7 @@ function refreshBalance(patientId) {
 
 // Load service options for billing
 function loadServiceOptions(patientId) {
-  fetch(`http://localhost/JAM_LYINGIN/auth/action/clerk/clerk_get_services_by_patient.php?patient_id=${patientId}`)
+  fetch(`${clerkApiBaseUrl}clerk_get_services_by_patient.php?patient_id=${patientId}`)
     .then(res => res.json())
     .then(data => {
       const select = document.getElementById('billServiceId');
@@ -2593,7 +2597,7 @@ function escapeHtml(text) {
 
 <script>
 function loadPatientServices(patientId, patientName) {
-  fetch(`http://localhost/JAM_LYINGIN/auth/action/clerk/clerk_get_services_by_patient.php?patient_id=${patientId}`)
+  fetch(`${clerkApiBaseUrl}clerk_get_services_by_patient.php?patient_id=${patientId}`)
     .then(res => res.json())
     .then(data => {
       const section = document.getElementById('services-section');
@@ -2695,7 +2699,7 @@ function loadPatientServices(patientId, patientName) {
     });
 }
 // Load service catalog and update dropdown
-fetch('http://localhost/JAM_LYINGIN/auth/action/clerk/clerk_get_service_catalog.php')
+fetch(clerkApiBaseUrl + 'clerk_get_service_catalog.php')
   .then(res => res.json())
   .then(catalog => {
     const dropdown = document.getElementById('service_type_1');
@@ -2921,7 +2925,7 @@ fetch('http://localhost/JAM_LYINGIN/auth/action/clerk/clerk_get_service_catalog.
                 </div>
                 <script>
                 function loadDoctorOptions() {
-                fetch('http://localhost/JAM_Lyingin/auth/action/clerk/clerk_get_staff_list.php')
+                fetch(clerkApiBaseUrl + 'clerk_get_staff_list.php')
                     .then(response => response.json())
                     .then(data => {
                     const dropdown = document.getElementById('service_doctor_1');
@@ -2999,7 +3003,7 @@ fetch('http://localhost/JAM_LYINGIN/auth/action/clerk/clerk_get_service_catalog.
     formData.append('service_amount', serviceAmount);
     formData.append('notes', notes);
 
-    fetch('http://localhost/JAM_Lyingin/auth/action/clerk/clerk_upload_service.php', {
+    fetch(clerkApiBaseUrl + 'clerk_upload_service.php', {
         method: 'POST',
         body: formData
     })

@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['register'])) {
 
 // Check if user is already logged in
 if (isset($_SESSION['usersmed_id'])) {
-    header('Location: dashboard.php');
+    header('Location: ' . URL_DASH_STAFF);
     exit();
 }
 ?>
@@ -279,11 +279,11 @@ if (isset($_SESSION['usersmed_id'])) {
             </form>
 
             <div class="toggle-form">
-                Already have an account? <a href="mslogin.php">Login here</a>
+                Already have an account? <a href="<?= BASE_PATH ?>/mslogin.php">Login here</a>
             </div>
 
             <div style="margin-top: 20px; text-align: center;">
-                <a href="front.html" class="btn" style="background: #f0f0f0; color: #333; text-decoration: none; display: inline-block; padding: 15px; border-radius: 8px; width: 100%; box-sizing: border-box;">Back to Home</a>
+                <a href="<?= URL_FRONT ?>" class="btn" style="background: #f0f0f0; color: #333; text-decoration: none; display: inline-block; padding: 15px; border-radius: 8px; width: 100%; box-sizing: border-box;">Back to Home</a>
             </div>
         </div>
 

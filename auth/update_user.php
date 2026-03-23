@@ -3,7 +3,7 @@
 // FUNCTION PHP.
 session_start();
 require '../config/config.php';
-require_once '../url.php';
+
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);

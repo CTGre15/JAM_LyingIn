@@ -1,21 +1,23 @@
 <?php
 //TEST URLS ONLYYYYY
 
+require_once __DIR__ . '/config/config.php';
+
 // Auth routes (User/Patient))
-define('URL_SIGNUP',      '/JAM_Lyingin/auth/signup.php');
-define('URL_LOGIN',       '/JAM_Lyingin/auth/login.php');
-define('URL_LOGOUT',      '/JAM_Lyingin/logout.php');
+defined('URL_SIGNUP') or define('URL_SIGNUP', BASE_PATH . '/auth/signup.php');
+defined('URL_LOGIN') or define('URL_LOGIN', BASE_PATH . '/auth/login.php');
+defined('URL_LOGOUT') or define('URL_LOGOUT', BASE_PATH . '/logout.php');
 // Auth function routes
-define('URL_UPDATE_USER', '/JAM_Lyingin/auth/update_user.php');
-define('URL_UPDATE_PATIENT', '/JAM_Lyingin/auth/handle_update_patient.php');
+defined('URL_UPDATE_USER') or define('URL_UPDATE_USER', BASE_PATH . '/auth/update_user.php');
+defined('URL_UPDATE_PATIENT') or define('URL_UPDATE_PATIENT', BASE_PATH . '/auth/handle_update_patient.php');
 
 // Auth routes (Medical Staff)
-define('URL_STAFF_LOGIN', '/JAM_Lyingin/auth/mslogin.php');
-define('URL_STAFF_SIGNUP',  '/JAM_Lyingin/msdash.php');
-define('URL_STAFF_DASH', '/JAM_Lyingin/dashboard.php');
+defined('URL_STAFF_LOGIN') or define('URL_STAFF_LOGIN', BASE_PATH . '/auth/mslogin.php');
+defined('URL_STAFF_SIGNUP') or define('URL_STAFF_SIGNUP', BASE_PATH . '/msdash.php');
+defined('URL_STAFF_DASH') or define('URL_STAFF_DASH', BASE_PATH . '/dashboard.php');
 // Dashboard routes
-define('URL_DASH_PATIENT', '/JAM_Lyingin/pdash.php');
+defined('URL_DASH_PATIENT') or define('URL_DASH_PATIENT', BASE_PATH . '/pdash.php');
 
 // Home
-define('URL_HOME', '/JAM_Lyingin/front.php');
-define('URL_OTP_PAGE', '/JAM_Lyingin/auth/otp_page.php');
+defined('URL_HOME') or define('URL_HOME', BASE_PATH . '/front.php');
+defined('URL_OTP_PAGE') or define('URL_OTP_PAGE', BASE_PATH . '/auth/otp_page.php');

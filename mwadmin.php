@@ -1,6 +1,7 @@
 <?php
 
 session_start();
+include_once 'config/url.php';
 
 
 
@@ -23,11 +24,12 @@ session_start();
         <a href="#" data-target="tab-new-user"><span class="nav-icon">👤</span><span class="nav-label">New User</span></a>
         <a href="#" data-target="tab-doctors"><span class="nav-icon">🩺</span><span class="nav-label">Doctors</span></a>
         <a href="#" data-target="tab-services"><span class="nav-icon">💼</span><span class="nav-label">Services</span></a>
-        <a href="dashboard.php" class="nav-back"><span class="nav-icon">←</span><span class="nav-label">Back to Dashboard</span></a>
+        <a href="<?= URL_DASH_STAFF ?>" class="nav-back"><span class="nav-icon">←</span><span class="nav-label">Back to Dashboard</span></a>
         <div class="spacer"></div>
         <button class="mini-nav-toggle" id="miniNavToggle">⟷</button>
     </nav>
     <script>
+    const adminApiBaseUrl = '<?= BASE_URL ?>auth/action/admin/';
     document.addEventListener('DOMContentLoaded', function(){
       const nav = document.querySelector('.mini-nav');
       const btn = document.getElementById('miniNavToggle');
@@ -186,7 +188,7 @@ session_start();
                   const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
                   const TIMES = ['08:00AM - 09:00AM','09:00AM - 10:00AM','10:00AM - 11:00AM','11:00AM - 12:00PM','01:00PM - 02:00PM','02:00PM - 03:00PM','03:00PM - 04:00PM','04:00PM - 05:00PM'];
 
-                  fetch('http://localhost/JAM_Lyingin/auth/action/admin/admin_get_doctor_schedules.php')
+                  fetch(adminApiBaseUrl + 'admin_get_doctor_schedules.php')
                     .then(res => res.json())
                     .then(data => {
                       if (data.status === 'success') {
@@ -237,7 +239,7 @@ session_start();
                             if (!confirm('Delete this doctor from the system?')) return;
                             const fd = new FormData();
                             fd.append('user_id', String(doc.user_id));
-                            fetch('http://localhost/JAM_Lyingin/auth/action/admin/admin_delete_doctor.php', { method: 'POST', body: fd })
+                            fetch(adminApiBaseUrl + 'admin_delete_doctor.php', { method: 'POST', body: fd })
                               .then(res => res.json())
                               .then(data => {
                                 if (data.status === 'success') {
@@ -271,7 +273,7 @@ session_start();
                       if (day && time) formData.set(`schedule_${uid}`, `${day} - ${time}`);
                     });
 
-                    fetch('http://localhost/JAM_Lyingin/auth/action/admin/admin_update_doctor_schedules.php', {
+                    fetch(adminApiBaseUrl + 'admin_update_doctor_schedules.php', {
                       method: 'POST',
                       body: formData
                     })
@@ -384,7 +386,7 @@ session_start();
                     formData.set('role', backendRole);
 
                     // Send request to backend
-                    fetch('http://localhost/JAM_Lyingin/auth/action/admin/admin_create_new_user.php', {
+                    fetch(adminApiBaseUrl + 'admin_create_new_user.php', {
                     method: 'POST',
                     body: formData
                     })
@@ -476,7 +478,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const formData = new FormData(form);
 
-    fetch('http://localhost/JAM_Lyingin/auth/action/admin/admin_update_doctor_services.php', {
+    fetch(adminApiBaseUrl + 'admin_update_doctor_services.php', {
       method: 'POST',
       body: formData
     })
@@ -500,7 +502,7 @@ document.addEventListener('DOMContentLoaded', () => {
 document.addEventListener('DOMContentLoaded', () => {
   const servicesContainer = document.getElementById('services-list');
 
-  fetch('http://localhost/JAM_Lyingin/auth/action/admin/admin_get_service_catalog.php')
+  fetch(adminApiBaseUrl + 'admin_get_service_catalog.php')
     .then(res => res.json())
     .then(data => {
       if (data.status === 'success') {
@@ -548,7 +550,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const fd = new FormData();
       fd.append('name', name);
       fd.append('amount', amount.toFixed(2));
-      fetch('http://localhost/JAM_Lyingin/auth/action/admin/admin_add_service_catalog.php', { method: 'POST', body: fd })
+      fetch(adminApiBaseUrl + 'admin_add_service_catalog.php', { method: 'POST', body: fd })
         .then(res => res.json())
         .then(data => {
           if (data.status === 'success' && data.id) {
@@ -583,7 +585,7 @@ document.addEventListener('DOMContentLoaded', () => {
 document.addEventListener('DOMContentLoaded', () => {
   const select = document.getElementById('doctor-select');
 
-  fetch('http://localhost/JAM_Lyingin/auth/action/admin/admin_get_doctors.php')
+  fetch(adminApiBaseUrl + 'admin_get_doctors.php')
     .then(res => res.json())
     .then(data => {
       if (data.status === 'success') {
@@ -605,7 +607,7 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 <script>
 // Fetch staff users who are not yet doctors and populate the select dropdown
-fetch('http://localhost/JAM_Lyingin/auth/action/admin/admin_get_staff_list.php')
+fetch(adminApiBaseUrl + 'admin_get_staff_list.php')
   .then(res => res.json())
   .then(data => {
     if (data.status === 'success') {
@@ -634,7 +636,7 @@ document.addEventListener('DOMContentLoaded', () => {
     e.preventDefault();
     const formData = new FormData(form);
 
-    fetch('http://localhost/JAM_Lyingin/auth/action/admin/admin_add_doctor.php', {
+    fetch(adminApiBaseUrl + 'admin_add_doctor.php', {
       method: 'POST',
       body: formData
     })
@@ -681,7 +683,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.addEventListener('DOMContentLoaded', () => {
             const tableBody = document.getElementById('serviceAmountTableBody');
 
-            fetch('http://localhost/JAM_Lyingin/auth/action/admin/admin_get_service_catalog.php')
+            fetch(adminApiBaseUrl + 'admin_get_service_catalog.php')
                 .then(res => res.json())
                 .then(data => {
                 if (data.status !== 'success') {
@@ -718,7 +720,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const formData = new FormData(this);
 
-                fetch('http://localhost/JAM_Lyingin/auth/action/admin/admin_update_service_catalog.php', {
+                fetch(adminApiBaseUrl + 'admin_update_service_catalog.php', {
                 method: 'POST',
                 body: formData
                 })
@@ -743,7 +745,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const formData = new FormData(this);
 
-            fetch('http://localhost/JAM_Lyingin/auth/action/admin/admin_update_service_catalog.php', {
+            fetch(adminApiBaseUrl + 'admin_update_service_catalog.php', {
                 method: 'POST',
                 body: formData
             })

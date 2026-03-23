@@ -25,6 +25,10 @@ $patient = $stmt->fetch(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="pdash.css">
 </head>
 <body>
+    <script>
+    const patientApiBaseUrl = '<?= BASE_URL ?>auth/action/patient/';
+    const sharedActionBasePath = '<?= BASE_PATH ?>/auth/action/';
+    </script>
     <div class="container">
         <div class="sidebar">
           <input type="hidden" name="user_id" value="<?= $_SESSION['user_id'] ?>">
@@ -101,7 +105,7 @@ $patient = $stmt->fetch(PDO::FETCH_ASSOC);
                           list.style.gap = '16px';
                           container.appendChild(list);
 
-                          fetch('http://localhost/JAM_LYINGIN/auth/action/patient/patient_get_appointment_requests.php')
+                          fetch(patientApiBaseUrl + 'patient_get_appointment_requests.php')
                             .then(res => res.json())
                             .then(data => {
                               list.innerHTML = '';
@@ -186,7 +190,7 @@ $patient = $stmt->fetch(PDO::FETCH_ASSOC);
                           const container = document.querySelector('.doctor-list');
                           container.innerHTML = `<div style="color: #6b7280;">Loading doctors...</div>`;
 
-                          fetch('http://localhost/JAM_LYINGIN/auth/action/patient/patient_get_doctor.php')
+                          fetch(patientApiBaseUrl + 'patient_get_doctor.php')
                             .then(res => res.json())
                             .then(data => {
                               container.innerHTML = '';
@@ -854,7 +858,7 @@ $patient = $stmt->fetch(PDO::FETCH_ASSOC);
             return;
           }
           
-          fetch('auth/action/submit_appointment_request.php', {
+          fetch(sharedActionBasePath + 'submit_appointment_request.php', {
             method: 'POST',
             body: formData
           })
@@ -1069,7 +1073,7 @@ $patient = $stmt->fetch(PDO::FETCH_ASSOC);
             return;
           }
 
-          fetch('auth/action/patient/patient_change_password.php', {
+          fetch(patientApiBaseUrl + 'patient_change_password.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -1102,7 +1106,7 @@ $patient = $stmt->fetch(PDO::FETCH_ASSOC);
             return;
           }
           
-          fetch(`http://localhost/JAM_Lyingin/auth/action/patient/patient_get_billing_summary.php?patient_id=${patientId}`)
+          fetch(`${patientApiBaseUrl}patient_get_billing_summary.php?patient_id=${patientId}`)
             .then(res => res.json())
             .then(data => {
               if (data.status !== 'success') {
@@ -1193,7 +1197,7 @@ $patient = $stmt->fetch(PDO::FETCH_ASSOC);
         function updateAOGFromEDC() {}
 
         function refreshAOGTracker() {
-          fetch('http://localhost/JAM_LYINGIN/auth/action/patient/patient_get_pregnancy_tracker.php')
+          fetch(patientApiBaseUrl + 'patient_get_pregnancy_tracker.php')
             .then(res => res.json())
             .then(data => {
               if (data.status === 'success') {
@@ -1231,7 +1235,7 @@ $patient = $stmt->fetch(PDO::FETCH_ASSOC);
           if (!list) return;
           list.innerHTML = `<div style="padding:12px;color:#6b7280;">Loading...</div>`;
 
-          fetch('http://localhost/JAM_LYINGIN/auth/action/patient/patient_get_visit_analytics.php')
+          fetch(patientApiBaseUrl + 'patient_get_visit_analytics.php')
             .then(res => res.json())
             .then(data => {
               list.innerHTML = '';

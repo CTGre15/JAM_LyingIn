@@ -21,8 +21,8 @@ include_once 'config/roleGate.php';
       <li><a href="#services" class="nav-link">Services</a></li>
       <li><a href="#doctors" class="nav-link">Doctors</a></li>
       <li><a href="#contact" class="nav-link">Contact Us</a></li>
-      <li><a href="auth/signup.php" class="nav-link">Sign Up</a></li>
-      <li><a href="auth/login.php?role=patient" class="nav-link">Sign In</a></li>
+      <li><a href="<?= URL_SIGNUP ?>" class="nav-link">Sign Up</a></li>
+      <li><a href="<?= URL_LOGIN_PATIENT ?>" class="nav-link">Sign In</a></li>
 
     </ul>
   </nav>

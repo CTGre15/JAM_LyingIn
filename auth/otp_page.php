@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once __DIR__ . '/../config/config.php';
 
 // ✅ Check if user data exists
 if (!isset($_SESSION['pending_user'])) {
@@ -20,10 +21,10 @@ $otp     = $_SESSION['pending_user']['otp'] ?? '';
 </head>
 <body>
     <nav class="navbar">
-        <a href="front.html" class="navbar-brand">JAM Lying-In Clinic</a>
+        <a href="<?= URL_FRONT ?>" class="navbar-brand">JAM Lying-In Clinic</a>
         <ul class="navbar-nav">
-            <li class="nav-item"><a href="mslogin.php" class="nav-link">Medical Staff</a></li>
-            <li class="nav-item"><a href="login.php?role=patient" class="nav-link">Patient Sign In</a></li>
+            <a href="<?= BASE_PATH ?>/auth/mslogin.php" class="nav-link">Medical Staff</a>
+            <a href="<?= URL_LOGIN_PATIENT ?>" class="nav-link">Patient Sign In</a>
         </ul>
     </nav>
 
@@ -41,7 +42,7 @@ $otp     = $_SESSION['pending_user']['otp'] ?? '';
                 <div class="alert alert-dev">[Dev Mode] OTP: <strong><?= htmlspecialchars($otp) ?></strong></div>
             <?php endif; ?>
 
-            <form method="POST" action="verify_otp.php" class="otp-form">
+            <form method="POST" action="<?= BASE_PATH ?>/auth/verify_otp.php" class="otp-form">
                 <div class="form-group">
                     <label for="otp_code">Enter Verification Code</label>
                     <div class="otp-input-container">
@@ -54,14 +55,14 @@ $otp     = $_SESSION['pending_user']['otp'] ?? '';
 
             <div class="resend-section">
                 <p>Didn't receive the code?</p>
-                <form method="POST" action="request_otp.php" style="display: inline;">
+                <form method="POST" action="<?= BASE_PATH ?>/auth/request_otp.php" style="display: inline;">
                     <input type="hidden" name="contact" value="<?= htmlspecialchars($contact) ?>">
                     <button type="submit" class="resend-btn">Resend OTP</button>
                 </form>
             </div>
 
             <div class="back-section">
-                <a href="login.php" class="back-link">← Back to Login</a>
+                <a href="<?= BASE_PATH ?>/auth/login.php" class="back-link">← Back to Login</a>
             </div>
         </div>
 
