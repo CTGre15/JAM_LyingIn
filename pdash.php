@@ -206,18 +206,25 @@ $patient = $stmt->fetch(PDO::FETCH_ASSOC);
                                     box-shadow: 0 1px 4px rgba(0,0,0,0.05);
                                   `;
 
+                                  function safeText(value) {
+                                    return escapeHtml(value ?? 'N/A');
+                                  }
+
                                   card.innerHTML = `
-                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                                       <div>
                                         <div style="font-weight: 600; font-size: 16px; color: #374151;">
-                                          ${escapeHtml(doc.full_name)}
+                                          ${safeText(doc.full_name)}
                                         </div>
-                                        <div style="font-size: 14px; color: #6b7280;">
-                                          ${escapeHtml(doc.email)}<br>
-                                          📞 ${escapeHtml(doc.contact)}
+                                        <div style="font-size: 14px; color: #6b7280; margin-top: 4px;">
+                                          ${safeText(doc.email)}<br>
+                                          📞 ${safeText(doc.contact)}
+                                        </div>
+                                        <div style="font-size: 14px; color: #4b5563; margin-top: 8px;">
+                                          <strong>Specialization:</strong> ${safeText(doc.specialization)}<br>
+                                          <strong>Schedule:</strong> ${safeText(doc.schedule)}
                                         </div>
                                       </div>
-                                      
                                     </div>
                                   `;
                                   container.appendChild(card);
@@ -294,167 +301,184 @@ $patient = $stmt->fetch(PDO::FETCH_ASSOC);
                   function openCreateBabyModal() {
                     var modal = document.getElementById('createBabyModal');
                     if (modal) modal.style.display = 'block';
+
                     var form = document.getElementById('createBabyForm');
                     if (form) {
                       var name = document.getElementById('babyNameInput');
                       var date = document.getElementById('babyBirthDate');
                       var photo = document.getElementById('babyPhotoInput');
+
                       if (name) name.value = '';
                       if (date) date.value = '';
                       if (photo) photo.value = '';
                     }
                   }
+
                   function closeCreateBabyModal() {
                     var modal = document.getElementById('createBabyModal');
                     if (modal) modal.style.display = 'none';
                   }
+
                   document.addEventListener('DOMContentLoaded', function() {
                     var placeholder = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="220" height="220"><rect width="100%" height="100%" fill="%23f8f9fe"/><circle cx="110" cy="90" r="36" fill="%23fde6ef"/><rect x="70" y="140" width="80" height="28" rx="14" fill="%23e5e7eb"/></svg>';
+
+                    const currentUserId = '<?= $_SESSION['user_id'] ?>';
+                    const babyGalleryKey = 'babyGallery_' + currentUserId;
+                    const profileKey = 'profile_' + currentUserId;
+
                     var dateInput = document.getElementById('babyBirthDate');
-                    if (dateInput) { dateInput.removeAttribute('min'); }
-                    var downscaleDataUrl = function(dataUrl, maxDim, quality) {
+                    if (dateInput) {
+                      dateInput.removeAttribute('min');
+                    }
+
+                    function downscaleDataUrl(dataUrl, maxDim, quality) {
                       return new Promise(function(resolve) {
                         var img = new Image();
                         img.onload = function() {
-                          var w = img.width, h = img.height;
+                          var w = img.width;
+                          var h = img.height;
                           var scale = Math.min(1, maxDim / Math.max(w, h));
                           var cw = Math.max(1, Math.round(w * scale));
                           var ch = Math.max(1, Math.round(h * scale));
+
                           var canvas = document.createElement('canvas');
-                          canvas.width = cw; canvas.height = ch;
+                          canvas.width = cw;
+                          canvas.height = ch;
+
                           var ctx = canvas.getContext('2d');
                           ctx.drawImage(img, 0, 0, cw, ch);
+
                           var out;
-                          try { out = canvas.toDataURL('image/jpeg', quality); } catch(e) { out = dataUrl; }
+                          try {
+                            out = canvas.toDataURL('image/jpeg', quality);
+                          } catch (e) {
+                            out = dataUrl;
+                          }
+
                           resolve(out);
                         };
-                        img.onerror = function() { resolve(dataUrl); };
+
+                        img.onerror = function() {
+                          resolve(dataUrl);
+                        };
+
                         img.src = dataUrl;
                       });
-                    };
-                    // Initialize gallery from localStorage
-                    try {
-                      var stored = JSON.parse(localStorage.getItem('babyGallery') || '[]');
+                    }
+
+                    function renderBabyGallery() {
                       var grid = document.querySelector('.baby-mosaic-grid');
-                      if (grid && Array.isArray(stored)) {
-                        stored.forEach(function(item) {
-                          var link = document.createElement('a');
-                          link.href = 'babyprofile.php';
-                          link.className = 'baby-card-link';
-                          var tile = document.createElement('div');
-                          tile.className = 'mosaic-item square';
-                          tile.dataset.name = (item && item.name) ? item.name : '';
-                          var img = document.createElement('img');
-                          img.className = 'mosaic-image';
-                          img.src = item.src || placeholder;
-                          tile.appendChild(img);
-                          link.appendChild(tile);
-                          grid.prepend(link);
-                        });
+                      if (!grid) return;
+
+                      grid.innerHTML = '';
+
+                      var stored = [];
+                      try {
+                        stored = JSON.parse(localStorage.getItem(babyGalleryKey) || '[]');
+                      } catch (e) {
+                        stored = [];
                       }
-                    } catch(e) {}
-                    // Handle create form submit
+
+                      if (!Array.isArray(stored)) stored = [];
+
+                      stored.forEach(function(item) {
+                        var link = document.createElement('a');
+                        link.href = 'babyprofile.php';
+                        link.className = 'baby-card-link';
+
+                        var tile = document.createElement('div');
+                        tile.className = 'mosaic-item square';
+                        tile.dataset.name = (item && item.name) ? item.name : '';
+
+                        var img = document.createElement('img');
+                        img.className = 'mosaic-image';
+                        img.src = (item && item.src) ? item.src : placeholder;
+
+                        tile.appendChild(img);
+                        link.appendChild(tile);
+                        grid.appendChild(link);
+                      });
+                    }
+
+                    function saveBabyProfile(imageSrc, babyName) {
+                      var gallery = [];
+                      try {
+                        gallery = JSON.parse(localStorage.getItem(babyGalleryKey) || '[]');
+                      } catch (e) {
+                        gallery = [];
+                      }
+
+                      if (!Array.isArray(gallery)) gallery = [];
+
+                      gallery.unshift({
+                        src: imageSrc || placeholder,
+                        name: babyName || ''
+                      });
+
+                      try {
+                        localStorage.setItem(babyGalleryKey, JSON.stringify(gallery));
+                      } catch (err) {
+                        gallery[0].src = placeholder;
+                        try {
+                          localStorage.setItem(babyGalleryKey, JSON.stringify(gallery));
+                        } catch (e2) {}
+                      }
+
+                      var profile = {};
+                      try {
+                        profile = JSON.parse(localStorage.getItem(profileKey) || '{}');
+                      } catch (e) {
+                        profile = {};
+                      }
+
+                      profile.child_name = babyName || '';
+                      profile.avatar = imageSrc || placeholder;
+
+                      localStorage.setItem(profileKey, JSON.stringify(profile));
+                    }
+
+                    renderBabyGallery();
+
                     var form = document.getElementById('createBabyForm');
                     if (form) {
-                      form.addEventListener('submit', function(ev){
+                      form.addEventListener('submit', function(ev) {
                         ev.preventDefault();
+
                         var fileInput = document.getElementById('babyPhotoInput');
                         var nameInput = document.getElementById('babyNameInput');
+
+                        var trimmed = nameInput ? nameInput.value.trim() : '';
                         var file = fileInput && fileInput.files && fileInput.files[0];
+
+                        if (!trimmed) {
+                          alert('Please enter the baby name.');
+                          return;
+                        }
+
                         if (file) {
                           var fr = new FileReader();
+
                           fr.onload = function(e) {
                             var src = e.target.result;
-                            var trimmed = (nameInput ? nameInput.value.trim() : '');
+
                             downscaleDataUrl(src, 800, 0.7).then(function(outSrc) {
-                              var gallery = [];
-                              try { gallery = JSON.parse(localStorage.getItem('babyGallery') || '[]'); } catch (e) { gallery = []; }
-                              gallery.unshift({ src: outSrc, name: trimmed });
-                              try { localStorage.setItem('babyGallery', JSON.stringify(gallery)); }
-                              catch (err) {
-                                gallery[0].src = placeholder;
-                                try { localStorage.setItem('babyGallery', JSON.stringify(gallery)); } catch(e2) {}
-                              }
-                              var profile = {};
-                              try { profile = JSON.parse(localStorage.getItem('profile') || '{}'); } catch (e) { profile = {}; }
-                              profile.child_name = trimmed;
-                              localStorage.setItem('profile', JSON.stringify(profile));
-                              var grid = document.querySelector('.baby-mosaic-grid');
-                              if (grid) {
-                                var link = document.createElement('a');
-                                link.href = 'babyprofile.php';
-                                link.className = 'baby-card-link';
-                                var tile = document.createElement('div');
-                                tile.className = 'mosaic-item square';
-                                tile.dataset.name = trimmed;
-                                var img = document.createElement('img');
-                                img.className = 'mosaic-image';
-                                img.src = outSrc || placeholder;
-                                tile.appendChild(img);
-                                link.appendChild(tile);
-                                grid.prepend(link);
-                              }
+                              saveBabyProfile(outSrc, trimmed);
+                              renderBabyGallery();
                               closeCreateBabyModal();
-                              window.location.href = 'babyprofile.php';
                             });
                           };
-                          fr.readAsDataURL(file);
+
                           fr.onerror = function() {
-                            var trimmed = (nameInput ? nameInput.value.trim() : '');
-                            var gallery = [];
-                            try { gallery = JSON.parse(localStorage.getItem('babyGallery') || '[]'); } catch (e) { gallery = []; }
-                            gallery.unshift({ src: placeholder, name: trimmed });
-                            localStorage.setItem('babyGallery', JSON.stringify(gallery));
-                            var profile = {};
-                            try { profile = JSON.parse(localStorage.getItem('profile') || '{}'); } catch (e) { profile = {}; }
-                            profile.child_name = trimmed;
-                            localStorage.setItem('profile', JSON.stringify(profile));
-                            var grid = document.querySelector('.baby-mosaic-grid');
-                            if (grid) {
-                              var link = document.createElement('a');
-                              link.href = 'babyprofile.php';
-                              link.className = 'baby-card-link';
-                              var tile = document.createElement('div');
-                              tile.className = 'mosaic-item square';
-                              tile.dataset.name = trimmed;
-                              var img = document.createElement('img');
-                              img.className = 'mosaic-image';
-                              img.src = placeholder;
-                              tile.appendChild(img);
-                              link.appendChild(tile);
-                              grid.prepend(link);
-                            }
+                            saveBabyProfile(placeholder, trimmed);
+                            renderBabyGallery();
                             closeCreateBabyModal();
-                            window.location.href = 'babyprofile.php';
                           };
+
+                          fr.readAsDataURL(file);
                         } else {
-                          var nameInput = document.getElementById('babyNameInput');
-                          var trimmed = (nameInput ? nameInput.value.trim() : '');
-                          var gallery = [];
-                          try { gallery = JSON.parse(localStorage.getItem('babyGallery') || '[]'); } catch (e) { gallery = []; }
-                          gallery.unshift({ src: placeholder, name: trimmed });
-                          localStorage.setItem('babyGallery', JSON.stringify(gallery));
-                          var profile = {};
-                          try { profile = JSON.parse(localStorage.getItem('profile') || '{}'); } catch (e) { profile = {}; }
-                          profile.child_name = trimmed;
-                          localStorage.setItem('profile', JSON.stringify(profile));
-                          var grid = document.querySelector('.baby-mosaic-grid');
-                          if (grid) {
-                            var link = document.createElement('a');
-                            link.href = 'babyprofile.php';
-                            link.className = 'baby-card-link';
-                            var tile = document.createElement('div');
-                            tile.className = 'mosaic-item square';
-                            tile.dataset.name = trimmed;
-                            var img = document.createElement('img');
-                            img.className = 'mosaic-image';
-                            img.src = placeholder;
-                            tile.appendChild(img);
-                            link.appendChild(tile);
-                            grid.prepend(link);
-                          }
+                          saveBabyProfile(placeholder, trimmed);
+                          renderBabyGallery();
                           closeCreateBabyModal();
-                          window.location.href = 'babyprofile.php';
                         }
                       });
                     }
@@ -858,7 +882,7 @@ $patient = $stmt->fetch(PDO::FETCH_ASSOC);
             return;
           }
           
-          fetch(sharedActionBasePath + 'submit_appointment_request.php', {
+          fetch('auth/action/submit_appointment_request.php', {
             method: 'POST',
             body: formData
           })
@@ -990,12 +1014,30 @@ $patient = $stmt->fetch(PDO::FETCH_ASSOC);
         
 
         // Update Patient Photo upload
-        document.getElementById('updatePhotoInput').addEventListener('change', function(e) {
+        document.getElementById('updatePhotoInput').addEventListener('change', function() {
           if (this.files && this.files[0]) {
             const reader = new FileReader();
+
             reader.onload = function(ev) {
-              document.getElementById('updatePatientPhoto').src = ev.target.result;
+              const newSrc = ev.target.result;
+
+              // settings preview
+              const settingsPhoto = document.getElementById('updatePatientPhoto');
+              if (settingsPhoto) {
+                settingsPhoto.src = newSrc;
+              }
+
+              // main dashboard photo
+              const dashboardPhoto = document.querySelector('.patient-photo');
+              if (dashboardPhoto) {
+                dashboardPhoto.src = newSrc;
+              }
+
+              // keep it after refresh
+              const currentUserId = '<?= $_SESSION['user_id'] ?>';
+              localStorage.setItem('patientPhoto_' + currentUserId, newSrc);
             };
+
             reader.readAsDataURL(this.files[0]);
           }
         });
@@ -1073,18 +1115,18 @@ $patient = $stmt->fetch(PDO::FETCH_ASSOC);
             return;
           }
 
-          fetch(patientApiBaseUrl + 'patient_change_password.php', {
+          const formData = new FormData();
+          formData.append('current_password', currentPassword);
+          formData.append('new_password', newPassword);
+
+          fetch('auth/action/patient/patient_change_password.php', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              current_password: currentPassword,
-              new_password: newPassword
-            })
+            body: formData
           })
-          .then(res => res.json())
+          .then(response => response.json())
           .then(data => {
             if (data.status === 'success') {
-              alert('Password changed successfully.');
+              alert(data.message);
               document.getElementById('currentPassword').value = '';
               document.getElementById('newPassword').value = '';
               document.getElementById('confirmPassword').value = '';
@@ -1092,8 +1134,8 @@ $patient = $stmt->fetch(PDO::FETCH_ASSOC);
               alert(data.message || 'Password change failed.');
             }
           })
-          .catch(err => {
-            console.error('Password change error:', err);
+          .catch(error => {
+            console.error('Error:', error);
             alert('An error occurred while changing password.');
           });
         }
@@ -1574,6 +1616,22 @@ function formatDateMedrec(date) {
             alert('VAW Risk search for date: ' + date + '\n(Backend integration needed)');
           };
         }
+        document.addEventListener('DOMContentLoaded', function() {
+          const currentUserId = '<?= $_SESSION['user_id'] ?>';
+          const savedPhoto = localStorage.getItem('patientPhoto_' + currentUserId);
+
+          if (savedPhoto) {
+            const settingsPhoto = document.getElementById('updatePatientPhoto');
+            if (settingsPhoto) {
+              settingsPhoto.src = savedPhoto;
+            }
+
+            const dashboardPhoto = document.querySelector('.patient-photo');
+            if (dashboardPhoto) {
+              dashboardPhoto.src = savedPhoto;
+            }
+          }
+        });
     </script>
 </body>
 </html>

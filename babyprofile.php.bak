@@ -1,9 +1,4 @@
-<?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-$userId = $_SESSION['user_id'] ?? '';
-?>
+<?php ?>
 <!doctype html>
 <html lang="en">
 <head>
@@ -14,12 +9,14 @@ $userId = $_SESSION['user_id'] ?? '';
 </head>
 <body>
 <div class="container">
+  <div class="sidebar collapsed" id="sidebar">
+    <div class="sidebar-header">Menu</div>
+    <button class="side-item" id="backBtn">← Back</button>
+    <button class="side-item" id="editProfileBtn">✎ Edit Profile</button>
+  </div>
   <div class="topbar">
+    <button class="sidebar-toggle" id="sidebarToggle">☰</button>
     <div class="title">JAM Lying-In Clinic - My Child's Record</div>
-    <div class="topbar-actions">
-      <button type="button" class="topbar-btn secondary" onclick="window.location.href='pdash.php'">← Back</button>
-      <button type="button" class="topbar-btn primary" onclick="enableProfileEdit()">✎ Edit Profile</button>
-    </div>
   </div>
   <div class="columns one">
     <div class="col main">
@@ -49,8 +46,8 @@ $userId = $_SESSION['user_id'] ?? '';
             <div class="row" data-field="pediatrician_contact"><span class="label">Pediatrician's Contact Number</span><span class="value"></span></div>
           </div>
           <div class="edit-actions" id="editActions">
-            <button type="button" id="saveProfile" class="primary" onclick="saveProfileNow()">Save Profile</button>
-            <button type="button" id="cancelEdit" class="secondary" onclick="cancelEditNow()">Cancel</button>
+            <button id="saveProfile" class="primary">Save Profile</button>
+            <button id="cancelEdit" class="secondary">Cancel</button>
           </div>
         </div>
       </div>
@@ -110,135 +107,6 @@ $userId = $_SESSION['user_id'] ?? '';
   </div>
 </div>
 <script>
-  const currentUserId = '<?= htmlspecialchars($userId, ENT_QUOTES) ?>';
-  const babyGalleryKey = 'babyGallery_' + currentUserId;
-  const profileKey = 'profile_' + currentUserId;
-
-  function enableProfileEdit() {
-    console.log('enableProfileEdit called');
-
-    var profileGrid = document.getElementById('profileGrid');
-    var editActions = document.getElementById('editActions');
-    var nameEditActions = document.getElementById('nameEditActions');
-    var photoEditActions = document.getElementById('photoEditActions');
-    var babyNameInput = document.getElementById('babyNameInput');
-    var babyName = document.getElementById('babyName');
-
-    if (!profileGrid) {
-      alert('profileGrid not found');
-      return;
-    }
-
-    profileGrid.querySelectorAll('.row').forEach(function(r) {
-      var key = r.getAttribute('data-field');
-      var valueEl = r.querySelector('.value');
-
-      if (!valueEl) return;
-      if (r.querySelector('input[data-key]')) return;
-
-      var current = valueEl.textContent || '';
-      var input = document.createElement('input');
-      input.type = (key === 'dob') ? 'date' : (key === 'tob' ? 'time' : 'text');
-      input.value = current;
-      input.setAttribute('data-key', key);
-
-      input.style.width = '100%';
-      input.style.padding = '8px';
-      input.style.border = '1px solid #ccc';
-      input.style.borderRadius = '6px';
-      input.style.display = 'block';
-
-      valueEl.replaceWith(input);
-    });
-
-    if (editActions) editActions.style.display = 'flex';
-    if (nameEditActions) nameEditActions.style.display = 'block';
-    if (photoEditActions) photoEditActions.style.display = 'block';
-
-    if (babyName && babyNameInput) {
-      babyNameInput.value = babyName.textContent || '';
-      babyNameInput.style.display = 'block';
-    }
-
-    alert('Edit mode opened');
-  }
-
-  function saveProfileNow() {
-    var profileGrid = document.getElementById('profileGrid');
-    var editActions = document.getElementById('editActions');
-    var nameEditActions = document.getElementById('nameEditActions');
-    var photoEditActions = document.getElementById('photoEditActions');
-    var babyNameInput = document.getElementById('babyNameInput');
-    var babyName = document.getElementById('babyName');
-
-    if (!profileGrid) return;
-
-    var data = {};
-    try {
-      data = JSON.parse(localStorage.getItem(profileKey) || '{}');
-    } catch (e) {
-      data = {};
-    }
-
-    profileGrid.querySelectorAll('input[data-key]').forEach(function(inp) {
-      var key = inp.getAttribute('data-key');
-      data[key] = inp.value;
-    });
-
-    if (babyNameInput) {
-      data.child_name = babyNameInput.value.trim();
-      if (babyName) {
-        babyName.textContent = data.child_name || 'Name';
-      }
-    }
-
-    localStorage.setItem(profileKey, JSON.stringify(data));
-
-    profileGrid.querySelectorAll('input[data-key]').forEach(function(inp) {
-      var span = document.createElement('span');
-      span.className = 'value';
-      span.textContent = inp.value;
-      inp.replaceWith(span);
-    });
-
-    if (editActions) editActions.style.display = 'none';
-    if (nameEditActions) nameEditActions.style.display = 'none';
-    if (photoEditActions) photoEditActions.style.display = 'none';
-  }
-
-  function cancelEditNow() {
-    var profileGrid = document.getElementById('profileGrid');
-    var editActions = document.getElementById('editActions');
-    var nameEditActions = document.getElementById('nameEditActions');
-    var photoEditActions = document.getElementById('photoEditActions');
-    var babyName = document.getElementById('babyName');
-
-    if (!profileGrid) return;
-
-    var data = {};
-    try {
-      data = JSON.parse(localStorage.getItem(profileKey) || '{}');
-    } catch (e) {
-      data = {};
-    }
-
-    profileGrid.querySelectorAll('input[data-key]').forEach(function(inp) {
-      var key = inp.getAttribute('data-key');
-      var span = document.createElement('span');
-      span.className = 'value';
-      span.textContent = data[key] || '';
-      inp.replaceWith(span);
-    });
-
-    if (babyName && data.child_name) {
-      babyName.textContent = data.child_name;
-    }
-
-    if (editActions) editActions.style.display = 'none';
-    if (nameEditActions) nameEditActions.style.display = 'none';
-    if (photoEditActions) photoEditActions.style.display = 'none';
-  }
-
   function setVisitDateMin() {
     var today = new Date();
     var yyyy = today.getFullYear();
@@ -252,7 +120,7 @@ $userId = $_SESSION['user_id'] ?? '';
       dateInputs.forEach(function(inp) {
         inp.min = min;
         inp.addEventListener('change', function() {
-          if (this.value && this.value < min) this.value = min;
+          if (this.value && this.value < min) { this.value = min; }
         });
       });
       var visitInput = dateInputs[0];
@@ -261,12 +129,11 @@ $userId = $_SESSION['user_id'] ?? '';
         visitInput.addEventListener('change', function() {
           var v = this.value || min;
           nextInput.min = v;
-          if (nextInput.value && nextInput.value < v) nextInput.value = v;
+          if (nextInput.value && nextInput.value < v) { nextInput.value = v; }
         });
       }
     }
   }
-
   var vaccineDoseMap = {
     "BCG": 1,
     "Hepatitis": 4,
@@ -287,12 +154,9 @@ $userId = $_SESSION['user_id'] ?? '';
     "Mantoux Test": 1,
     "Typhoid": 2
   };
-
   function getSavedImmunization() {
-    try { return JSON.parse(localStorage.getItem('immunization') || '[]'); }
-    catch (e) { return []; }
+    try { return JSON.parse(localStorage.getItem('immunization') || '[]'); } catch (e) { return []; }
   }
-
   function maxDoseForType(type) {
     var max = 0;
     getSavedImmunization().forEach(function(r) {
@@ -301,101 +165,128 @@ $userId = $_SESSION['user_id'] ?? '';
         if (d > max) max = d;
       }
     });
+    document.querySelectorAll('#immunizationBody .form-grid').forEach(function(g) {
+      var sel = g.querySelector('.vaccine-type');
+      var oth = g.querySelector('.vaccine-type-other');
+      var eff = (sel && sel.value === 'Others') ? (oth ? oth.value : '') : sel ? sel.value : '';
+      if (eff === type) {
+        var d = parseInt((g.querySelector('.dose') || {}).value || 0, 10);
+        if (d > max) max = d;
+      }
+    });
     return max;
   }
-
   function computeNextDose(type) {
     var next = maxDoseForType(type) + 1;
     var cap = vaccineDoseMap[type];
-    if (cap) next = Math.min(next, cap);
+    if (cap) { next = Math.min(next, cap); }
     return next || 1;
   }
-
+  function attachVaccineTypeHandlers(root) {
+    var select = root.querySelector('.vaccine-type');
+    var dose = root.querySelector('.dose');
+    var other = root.querySelector('.vaccine-type-other');
+    function updateDose() {
+      var v = select.value;
+      if (v === 'Others') {
+        other.style.display = 'block';
+        var eff = other.value.trim();
+        dose.value = eff ? computeNextDose(eff) : 1;
+      } else {
+        other.style.display = 'none';
+        dose.value = computeNextDose(v);
+      }
+    }
+    select.addEventListener('change', updateDose);
+    if (other) { other.addEventListener('input', updateDose); }
+    updateDose();
+  }
   function buildImmunizationAccordion() {
     var acc = document.getElementById('immunizationAccordion');
-    if (!acc) return;
     acc.innerHTML = '';
-
     Object.keys(vaccineDoseMap).forEach(function(type, idx) {
       var count = vaccineDoseMap[type];
       var shade = (idx % 2 === 0) ? 'pink' : 'purple';
       var item = document.createElement('div');
       item.className = 'acc-item';
       item.dataset.type = type;
-
       var header = document.createElement('div');
       header.className = 'acc-header ' + shade;
       header.innerHTML = '<span class="acc-title">' + type + '</span><span class="acc-caret">▾</span>';
-
       var body = document.createElement('div');
       body.className = 'acc-body';
-
       var tbl = document.createElement('table');
       tbl.className = 'dose-table';
       tbl.innerHTML = '<thead><tr><th>Dose</th><th>Location</th><th>Date</th><th>Reaction</th><th>Remarks</th></tr></thead><tbody></tbody>';
-
       var tb = tbl.querySelector('tbody');
       for (var i = 1; i <= count; i++) {
         var tr = document.createElement('tr');
         tr.className = 'dose-row';
         tr.dataset.type = type;
         tr.dataset.dose = i;
-        tr.innerHTML = '<td>' + i + '</td><td></td><td></td><td></td><td></td>';
+        var tdDose = document.createElement('td');
+        tdDose.textContent = i;
+        var tdLoc = document.createElement('td');
+        tdLoc.innerHTML = '';
+        var tdDate = document.createElement('td');
+        tdDate.innerHTML = '';
+        var tdReact = document.createElement('td');
+        tdReact.innerHTML = '';
+        var tdRemarks = document.createElement('td');
+        tdRemarks.innerHTML = '';
+        tr.appendChild(tdDose);
+        tr.appendChild(tdLoc);
+        tr.appendChild(tdDate);
+        tr.appendChild(tdReact);
+        tr.appendChild(tdRemarks);
         tb.appendChild(tr);
       }
-
       body.appendChild(tbl);
       item.appendChild(header);
       item.appendChild(body);
       acc.appendChild(item);
     });
-
     acc.addEventListener('click', function(e) {
       var h = e.target.closest('.acc-header');
       if (!h) return;
       var it = h.parentNode;
-      acc.querySelectorAll('.acc-item').forEach(function(x) {
-        if (x !== it) x.classList.remove('open');
-      });
+      acc.querySelectorAll('.acc-item').forEach(function(x){ if (x !== it) x.classList.remove('open') });
       it.classList.toggle('open');
     });
-
     var first = acc.querySelector('.acc-item');
     if (first) first.classList.add('open');
   }
-
   function applySavedImmunization() {
     var acc = document.getElementById('immunizationAccordion');
-    if (!acc) return;
     var saved = getSavedImmunization();
     if (!saved.length) return;
-
     var map = {};
-    saved.forEach(function(r) {
-      map[(r.type || '') + '|' + (r.dose || '')] = r;
-    });
-
+    saved.forEach(function(r) { map[(r.type || '') + '|' + (r.dose || '')] = r });
     acc.querySelectorAll('.dose-row').forEach(function(r) {
       var type = r.dataset.type;
       var dose = r.dataset.dose;
       var data = map[(type || '') + '|' + dose];
       if (!data) return;
-
       var cells = r.querySelectorAll('td');
-      if (cells[1]) cells[1].textContent = data.location || '';
-      if (cells[2]) cells[2].textContent = data.date || '';
-      if (cells[3]) cells[3].textContent = data.reaction || '';
-      if (cells[4]) cells[4].textContent = data.remarks || '';
+      function setCell(cell, val) {
+        if (!val) return;
+        cell.innerHTML = '';
+        var span = document.createElement('span');
+        span.className = 'saved-value';
+        span.textContent = val;
+        cell.appendChild(span);
+      }
+      setCell(cells[1], data.location);
+      setCell(cells[2], data.date);
+      setCell(cells[3], data.reaction);
+      setCell(cells[4], data.remarks);
     });
   }
-
   function renderImmunizationResult() {
     var container = document.getElementById('immunizationResult');
     if (!container) return;
-
     container.innerHTML = '';
     var rows = getSavedImmunization();
-
     if (rows.length === 0) {
       var empty = document.createElement('div');
       empty.className = 'empty-note';
@@ -403,12 +294,10 @@ $userId = $_SESSION['user_id'] ?? '';
       container.appendChild(empty);
       return;
     }
-
     rows.forEach(function(r) {
       var max = vaccineDoseMap[r.type];
       var d = parseInt(r.dose || 1, 10);
       var doseText = max ? ('Dose ' + d + ' of ' + max) : ('Dose ' + d);
-
       var card = document.createElement('div');
       card.className = 'result-card';
       card.innerHTML =
@@ -418,7 +307,6 @@ $userId = $_SESSION['user_id'] ?? '';
         '<div><span class="mini-label">Date</span><div class="mini-value">' + (r.date || '') + '</div></div>' +
         '<div><span class="mini-label">Reaction</span><div class="mini-value">' + (r.reaction || '') + '</div></div>' +
         '<div><span class="mini-label">Remarks</span><div class="mini-value">' + (r.remarks || '') + '</div></div>';
-
       container.appendChild(card);
     });
   }
@@ -434,14 +322,10 @@ $userId = $_SESSION['user_id'] ?? '';
     if (days === 1) return 'Yesterday';
     return days + ' days ago';
   }
-
   function renderMilestones() {
     var feed = document.getElementById('feed');
-    if (!feed) return;
-
     var list = JSON.parse(localStorage.getItem('milestones') || '[]');
     feed.innerHTML = '';
-
     list.forEach(function(m) {
       var gallery = '';
       if (m.photos && m.photos.length) {
@@ -450,7 +334,6 @@ $userId = $_SESSION['user_id'] ?? '';
             return '<img class="post-thumb" src="' + u + '" data-src="' + u + '">';
           }).join('') + '</div>';
       }
-
       var card = document.createElement('div');
       card.className = 'post';
       card.dataset.id = m.ts;
@@ -464,42 +347,43 @@ $userId = $_SESSION['user_id'] ?? '';
           '</div>' +
         '</div>' +
         '<div class="post-text">' + (m.text || '') + '</div>' + gallery;
-
       feed.appendChild(card);
     });
   }
-
   function readFilesAsDataUrls(files) {
-    return Promise.all(Array.from(files).map(function(file) {
-      return new Promise(function(res) {
-        var fr = new FileReader();
-        fr.onload = function(e) { res(e.target.result); };
-        fr.readAsDataURL(file);
-      });
-    }));
+    return Promise.all(
+      Array.from(files).slice(0, 5).map(function(file) {
+        return new Promise(function(res) {
+          var fr = new FileReader();
+          fr.onload = function(e) { res(e.target.result); };
+          fr.readAsDataURL(file);
+        });
+      })
+    );
   }
-
+  document.getElementById('attachPhoto').addEventListener('click', function() {
+    document.getElementById('milestonePhoto').click();
+  });
   function updatePostEnabled() {
-    var textEl = document.getElementById('milestoneText');
-    var photoEl = document.getElementById('milestonePhoto');
-    var postBtn = document.getElementById('postMilestone');
-    if (!textEl || !photoEl || !postBtn) return;
-
-    var t = textEl.value.trim();
-    var files = photoEl.files;
+    var t = document.getElementById('milestoneText').value.trim();
+    var files = document.getElementById('milestonePhoto').files;
     var hasPhotos = files && files.length > 0;
-    postBtn.disabled = !(t || hasPhotos);
+    document.getElementById('postMilestone').disabled = !(t || hasPhotos);
   }
-
   var selectedFiles = [];
+
+  document.getElementById('milestonePhoto').addEventListener('change', function() {
+    var files = Array.from(this.files);
+    selectedFiles = selectedFiles.concat(files).slice(0, 5);
+    updatePreview();
+    updatePostEnabled();
+  });
 
   function updatePreview() {
     var preview = document.getElementById('photoPreview');
     var count = document.getElementById('photoCount');
-    if (!preview || !count) return;
-
     count.textContent = selectedFiles.length + '/5';
-
+    
     readFilesAsDataUrls(selectedFiles).then(function(urls) {
       preview.innerHTML = urls.map(function(u, index) {
         return '<div class="preview-item">' +
@@ -507,10 +391,11 @@ $userId = $_SESSION['user_id'] ?? '';
                '<button class="delete-photo-btn" data-index="' + index + '">×</button>' +
                '</div>';
       }).join('');
-
+      
+      // Add delete handlers
       preview.querySelectorAll('.delete-photo-btn').forEach(function(btn) {
         btn.addEventListener('click', function() {
-          var idx = parseInt(this.dataset.index, 10);
+          var idx = parseInt(this.dataset.index);
           selectedFiles.splice(idx, 1);
           updatePreview();
           updatePostEnabled();
@@ -519,6 +404,55 @@ $userId = $_SESSION['user_id'] ?? '';
     });
   }
 
+  function readFilesAsDataUrls(files) {
+    return Promise.all(files.map(function(file) {
+      return new Promise(function(res) {
+        var fr = new FileReader();
+        fr.onload = function(e) { res(e.target.result) };
+        fr.readAsDataURL(file);
+      })
+    }));
+  }
+
+  document.getElementById('milestoneText').addEventListener('input', updatePostEnabled);
+  document.getElementById('postMilestone').addEventListener('click', function() {
+    var t = document.getElementById('milestoneText').value;
+    var now = new Date();
+    
+    readFilesAsDataUrls(selectedFiles).then(function(urls) {
+      var gallery = '';
+      if (urls.length) {
+        gallery = '<div class="post-gallery">' +
+          urls.map(function(u) {
+            return '<img class="post-thumb" src="' + u + '" data-src="' + u + '">';
+          }).join('') + '</div>';
+      }
+      var card = document.createElement('div');
+      card.className = 'post';
+      card.dataset.id = now.toISOString();
+      card.innerHTML =
+        '<div class="post-header">' +
+          '<div class="post-meta">' + formatRelative(now.toISOString()) + '</div>' +
+          '<button class="more-btn" aria-label="More">⋯</button>' +
+          '<div class="post-menu">' +
+            '<button class="menu-item edit">Edit</button>' +
+            '<button class="menu-item delete">Delete</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="post-text">' + t + '</div>' + gallery;
+      document.getElementById('feed').prepend(card);
+      var list = JSON.parse(localStorage.getItem('milestones') || '[]');
+      list.unshift({ ts: now.toISOString(), text: t, photos: urls });
+      localStorage.setItem('milestones', JSON.stringify(list));
+      
+      // Reset form
+      document.getElementById('milestoneText').value = '';
+      document.getElementById('milestonePhoto').value = '';
+      selectedFiles = [];
+      updatePreview();
+      updatePostEnabled();
+    });
+  });  // Add missing button handlers
   document.addEventListener('DOMContentLoaded', function() {
     buildImmunizationAccordion();
     applySavedImmunization();
@@ -527,6 +461,7 @@ $userId = $_SESSION['user_id'] ?? '';
     renderMilestones();
     updatePostEnabled();
 
+    // Tabs logic
     var tabs = document.querySelectorAll('.tab-btn');
     tabs.forEach(function(b) {
       b.addEventListener('click', function() {
@@ -537,145 +472,179 @@ $userId = $_SESSION['user_id'] ?? '';
       });
     });
 
-    var data = JSON.parse(localStorage.getItem(profileKey) || '{}');
+    // Sidebar toggle logic copied from docbbyprof.php
+    var sidebarToggle = document.getElementById('sidebarToggle');
+    var sidebar = document.getElementById('sidebar');
+    var container = document.querySelector('.container');
+
+    if (sidebarToggle && sidebar && container) {
+      // Initialize state on load
+      if (!sidebar.classList.contains('collapsed')) {
+        container.classList.add('with-sidebar');
+      }
+
+      sidebarToggle.addEventListener('click', function() {
+        sidebar.classList.toggle('collapsed');
+        var open = !sidebar.classList.contains('collapsed');
+        if (open) {
+          container.classList.add('with-sidebar');
+        } else {
+          container.classList.remove('with-sidebar');
+        }
+      });
+    }
+    // Back button
+    var backBtn = document.getElementById('backBtn');
+    if (backBtn) {
+      backBtn.addEventListener('click', function() {
+        window.history.back();
+      });
+    }
+  // Edit profile button
+  var editProfileBtn = document.getElementById('editProfileBtn');
+  var saveProfile = document.getElementById('saveProfile');
+  var cancelEdit = document.getElementById('cancelEdit');
+  var profileGrid = document.getElementById('profileGrid');
+  var editActions = document.getElementById('editActions');
+  var nameEditActions = document.getElementById('nameEditActions');
+  var photoEditActions = document.getElementById('photoEditActions');
+  var babyNameInput = document.getElementById('babyNameInput');
+  var babyName = document.getElementById('babyName');
+
+  function toInputs() {
+    var excludedFields = ['gender', 'dob', 'tob', 'pob', 'height', 'weight', 'pediatrician', 'pediatrician_contact'];
     profileGrid.querySelectorAll('.row').forEach(function(r) {
       var key = r.dataset.field;
-      var span = r.querySelector('.value');
-      if (data[key]) span.textContent = data[key];
+      if (excludedFields.indexOf(key) !== -1) return;
+      var v = r.querySelector('.value');
+      var current = v.textContent || '';
+      var input = document.createElement('input');
+      input.type = 'text';
+      input.placeholder = r.querySelector('.label').textContent;
+      input.value = current;
+      input.dataset.key = key;
+      v.replaceWith(input);
     });
+    if (editActions) editActions.style.display = 'block';
+    if (nameEditActions) nameEditActions.style.display = 'block';
+    if (photoEditActions) photoEditActions.style.display = 'block';
+    if (babyName && babyNameInput) babyNameInput.value = babyName.textContent;
+    if (profileGrid) profileGrid.classList.add('editing');
+  }
 
-    if (data.child_name && babyName) babyName.textContent = data.child_name;
+  function toSpans() {
+    profileGrid.querySelectorAll('input[data-key]').forEach(function(inp) {
+      var span = document.createElement('span');
+      span.className = 'value';
+      span.textContent = inp.value;
+      inp.replaceWith(span);
+    });
+    if (editActions) editActions.style.display = 'none';
+    if (nameEditActions) nameEditActions.style.display = 'none';
+    if (photoEditActions) photoEditActions.style.display = 'none';
+    if (profileGrid) profileGrid.classList.remove('editing');
+  }
 
-    var avatarSrc = data.avatar || '';
-    if (!avatarSrc) {
-      try {
-        var gallery = JSON.parse(localStorage.getItem(babyGalleryKey) || '[]');
-        if (Array.isArray(gallery) && gallery.length > 0) {
-          avatarSrc = gallery[0].src || '';
-        }
-      } catch (e) {}
-    }
+  if (editProfileBtn) {
+    editProfileBtn.addEventListener('click', toInputs);
+  }
 
-    if (avatarSrc) {
-      var avatar = document.getElementById('avatar');
-      if (avatar) {
-        avatar.style.backgroundImage = 'url(' + avatarSrc + ')';
-        avatar.style.backgroundSize = 'cover';
-        avatar.style.backgroundPosition = 'center';
+  if (saveProfile) {
+    saveProfile.addEventListener('click', function() {
+      var data = JSON.parse(localStorage.getItem('profile') || '{}');
+      profileGrid.querySelectorAll('input[data-key]').forEach(function(i) {
+        data[i.dataset.key] = i.value;
+      });
+      if (babyNameInput) {
+        data.child_name = babyNameInput.value.trim();
+        if (babyName) babyName.textContent = data.child_name;
       }
-    }
+      localStorage.setItem('profile', JSON.stringify(data));
+      toSpans();
+    });
+  }
 
-    var changePhoto = document.getElementById('changePhoto');
-    if (changePhoto) {
-      changePhoto.addEventListener('click', function() {
-        var avatarInput = document.getElementById('avatarInput');
-        if (avatarInput) avatarInput.click();
+  if (cancelEdit) {
+    cancelEdit.addEventListener('click', function() {
+      toSpans();
+      var data = JSON.parse(localStorage.getItem('profile') || '{}');
+      profileGrid.querySelectorAll('.row').forEach(function(r) {
+        var key = r.dataset.field;
+        var span = r.querySelector('.value');
+        if (data[key]) span.textContent = data[key];
       });
+      if (data.child_name && babyName) babyName.textContent = data.child_name;
+    });
+  }
+
+  // Load profile data
+  var data = JSON.parse(localStorage.getItem('profile') || '{}');
+  profileGrid.querySelectorAll('.row').forEach(function(r) {
+    var key = r.dataset.field;
+    var span = r.querySelector('.value');
+    if (data[key]) span.textContent = data[key];
+  });
+  if (data.child_name && babyName) babyName.textContent = data.child_name;
+  if (data.avatar) {
+    var avatar = document.getElementById('avatar');
+    if (avatar) {
+      avatar.style.backgroundImage = 'url(' + data.avatar + ')';
+      avatar.style.backgroundSize = 'cover';
     }
+  }
 
-    var avatarInput = document.getElementById('avatarInput');
-    if (avatarInput) {
-      avatarInput.addEventListener('change', function() {
-        if (this.files && this.files[0]) {
-          var reader = new FileReader();
-          reader.onload = function(e) {
-            var avatar = document.getElementById('avatar');
-            if (avatar) {
-              avatar.style.backgroundImage = 'url(' + e.target.result + ')';
-              avatar.style.backgroundSize = 'cover';
-              avatar.style.backgroundPosition = 'center';
-              var data = JSON.parse(localStorage.getItem(profileKey) || '{}');
-              data.avatar = e.target.result;
-              localStorage.setItem(profileKey, JSON.stringify(data));
-            }
-          };
-          reader.readAsDataURL(this.files[0]);
-        }
-      });
-    }
-
-    var attachPhoto = document.getElementById('attachPhoto');
-    if (attachPhoto) {
-      attachPhoto.addEventListener('click', function() {
-        var milestonePhoto = document.getElementById('milestonePhoto');
-        if (milestonePhoto) milestonePhoto.click();
-      });
-    }
-
-    var milestonePhoto = document.getElementById('milestonePhoto');
-    if (milestonePhoto) {
-      milestonePhoto.addEventListener('change', function() {
-        var files = Array.from(this.files);
-        selectedFiles = selectedFiles.concat(files).slice(0, 5);
-        updatePreview();
-        updatePostEnabled();
-      });
-    }
-
-    var milestoneText = document.getElementById('milestoneText');
-    if (milestoneText) {
-      milestoneText.addEventListener('input', updatePostEnabled);
-    }
-
-    var postMilestone = document.getElementById('postMilestone');
-    if (postMilestone) {
-      postMilestone.addEventListener('click', function() {
-        var t = document.getElementById('milestoneText').value;
-        var now = new Date();
-
-        readFilesAsDataUrls(selectedFiles).then(function(urls) {
-          var gallery = '';
-          if (urls.length) {
-            gallery = '<div class="post-gallery">' +
-              urls.map(function(u) {
-                return '<img class="post-thumb" src="' + u + '" data-src="' + u + '">';
-              }).join('') + '</div>';
+  // Change photo button
+  var changePhoto = document.getElementById('changePhoto');
+  if (changePhoto) {
+    changePhoto.addEventListener('click', function() {
+      var avatarInput = document.getElementById('avatarInput');
+      if (avatarInput) {
+        avatarInput.click();
+      }
+    });
+  }
+  // Avatar input change
+  var avatarInput = document.getElementById('avatarInput');
+  if (avatarInput) {
+    avatarInput.addEventListener('change', function() {
+      if (this.files && this.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          var avatar = document.getElementById('avatar');
+          if (avatar) {
+            avatar.style.backgroundImage = 'url(' + e.target.result + ')';
+            avatar.style.backgroundSize = 'cover';
+            avatar.style.backgroundPosition = 'center';
+            var data = JSON.parse(localStorage.getItem('profile') || '{}');
+            data.avatar = e.target.result;
+            localStorage.setItem('profile', JSON.stringify(data));
           }
+        };
+        reader.readAsDataURL(this.files[0]);
+      }
+    });
+  }
 
-          var card = document.createElement('div');
-          card.className = 'post';
-          card.dataset.id = now.toISOString();
-          card.innerHTML =
-            '<div class="post-header">' +
-              '<div class="post-meta">' + formatRelative(now.toISOString()) + '</div>' +
-              '<button class="more-btn" aria-label="More">⋯</button>' +
-              '<div class="post-menu">' +
-                '<button class="menu-item edit">Edit</button>' +
-                '<button class="menu-item delete">Delete</button>' +
-              '</div>' +
-            '</div>' +
-            '<div class="post-text">' + t + '</div>' + gallery;
-
-          document.getElementById('feed').prepend(card);
-
-          var list = JSON.parse(localStorage.getItem('milestones') || '[]');
-          list.unshift({ ts: now.toISOString(), text: t, photos: urls });
-          localStorage.setItem('milestones', JSON.stringify(list));
-
-          document.getElementById('milestoneText').value = '';
-          document.getElementById('milestonePhoto').value = '';
-          selectedFiles = [];
-          updatePreview();
-          updatePostEnabled();
-        });
-      });
-    }
-
+    // Close image viewer
     var closeViewer = document.getElementById('closeViewer');
     if (closeViewer) {
       closeViewer.addEventListener('click', function() {
         var imageViewer = document.getElementById('imageViewer');
-        if (imageViewer) imageViewer.classList.add('hidden');
+        if (imageViewer) {
+          imageViewer.classList.add('hidden');
+        }
       });
     }
-
+    // Image viewer click
     var imageViewer = document.getElementById('imageViewer');
     if (imageViewer) {
       imageViewer.addEventListener('click', function(e) {
-        if (e.target === this) this.classList.add('hidden');
+        if (e.target === this) {
+          this.classList.add('hidden');
+        }
       });
     }
-
+    // Photo preview click
     var photoPreview = document.getElementById('photoPreview');
     if (photoPreview) {
       photoPreview.addEventListener('click', function(e) {
@@ -689,7 +658,7 @@ $userId = $_SESSION['user_id'] ?? '';
         }
       });
     }
-
+    // Feed click
     var feed = document.getElementById('feed');
     if (feed) {
       feed.addEventListener('click', function(e) {
@@ -701,25 +670,21 @@ $userId = $_SESSION['user_id'] ?? '';
             imageViewer.classList.remove('hidden');
           }
         }
-
         if (e.target.classList.contains('more-btn')) {
           var post = e.target.closest('.post');
           var menu = post.querySelector('.post-menu');
           if (menu) {
-            document.querySelectorAll('.post-menu.open').forEach(function(m) {
-              if (m !== menu) m.classList.remove('open');
-            });
+            // Close other menus
+            document.querySelectorAll('.post-menu.open').forEach(function(m){ if (m !== menu) m.classList.remove('open'); });
             menu.classList.toggle('open');
           }
         }
-
         if (e.target.classList.contains('menu-item')) {
           var post = e.target.closest('.post');
           var id = post && post.dataset.id;
           var list = JSON.parse(localStorage.getItem('milestones') || '[]');
-
           if (e.target.classList.contains('delete')) {
-            list = list.filter(function(m) { return m.ts !== id; });
+            list = list.filter(function(m){ return m.ts !== id; });
             localStorage.setItem('milestones', JSON.stringify(list));
             renderMilestones();
           } else if (e.target.classList.contains('edit')) {
@@ -727,25 +692,22 @@ $userId = $_SESSION['user_id'] ?? '';
           }
         }
       });
-
-      document.addEventListener('click', function(ev) {
+      // Close menus on outside click
+      document.addEventListener('click', function(ev){
         if (!ev.target.closest('.post')) {
-          document.querySelectorAll('.post-menu.open').forEach(function(m) {
-            m.classList.remove('open');
-          });
+          document.querySelectorAll('.post-menu.open').forEach(function(m){ m.classList.remove('open'); });
         }
       });
     }
-
     function enterInlineEdit(post, id) {
-      document.querySelectorAll('.post.editing').forEach(function(p) {
+      // Prevent duplicate editors
+      document.querySelectorAll('.post.editing').forEach(function(p){
         if (p !== post) exitInlineEdit(p);
       });
-
       post.classList.add('editing');
       var textEl = post.querySelector('.post-text');
       var current = textEl ? textEl.textContent : '';
-
+      // Build editor
       var editor = document.createElement('div');
       editor.className = 'post-edit';
       editor.innerHTML =
@@ -754,95 +716,83 @@ $userId = $_SESSION['user_id'] ?? '';
           '<button class="inline-primary save-inline">Save</button>' +
           '<button class="inline-secondary cancel-inline">Cancel</button>' +
         '</div>';
-
       textEl.replaceWith(editor);
-
+      // Wire actions
       var saveBtn = editor.querySelector('.save-inline');
       var cancelBtn = editor.querySelector('.cancel-inline');
-
-      saveBtn.addEventListener('click', function() {
+      saveBtn.addEventListener('click', function(){
         var val = editor.querySelector('.post-edit-text').value;
         var list = JSON.parse(localStorage.getItem('milestones') || '[]');
-        list = list.map(function(m) {
-          if (m.ts === id) m.text = val;
-          return m;
-        });
+        list = list.map(function(m){ if (m.ts === id) m.text = val; return m; });
         localStorage.setItem('milestones', JSON.stringify(list));
         renderMilestones();
       });
-
-      cancelBtn.addEventListener('click', function() {
+      cancelBtn.addEventListener('click', function(){
         exitInlineEdit(post);
       });
     }
-
     function exitInlineEdit(post) {
       var editor = post.querySelector('.post-edit');
       if (!editor) return;
-
       var id = post.dataset.id;
       var list = JSON.parse(localStorage.getItem('milestones') || '[]');
       var original = '';
-
       for (var i = 0; i < list.length; i++) {
-        if (list[i].ts === id) {
-          original = list[i].text || '';
-          break;
-        }
+        if (list[i].ts === id) { original = list[i].text || ''; break; }
       }
-
       var textEl = document.createElement('div');
       textEl.className = 'post-text';
       textEl.textContent = original;
       editor.replaceWith(textEl);
       post.classList.remove('editing');
     }
-
+    // Record search date
     var recordSearchDate = document.getElementById('recordSearchDate');
     if (recordSearchDate) {
       recordSearchDate.addEventListener('change', function() {
         var date = this.value;
         if (!date) return;
-
+        
         fetch('records_api.php?date=' + encodeURIComponent(date))
           .then(function(response) { return response.json(); })
           .then(function(data) {
-            var grid = document.querySelector('#recordsBody .form-grid');
-            if (!grid) return;
-            var savedValues = grid.querySelectorAll('.saved-value');
-            savedValues.forEach(function(s) { s.textContent = ''; });
-
-            var record = (Array.isArray(data) && data.length > 0) ? data[0] : null;
-            if (record) {
-              if (savedValues[0]) savedValues[0].textContent = record.visit || '';
-              if (savedValues[1]) savedValues[1].textContent = record.age || '';
-              if (savedValues[2]) savedValues[2].textContent = record.weight || '';
-              if (savedValues[3]) savedValues[3].textContent = record.head || '';
-              if (savedValues[4]) savedValues[4].textContent = record.chest || '';
-              if (savedValues[5]) savedValues[5].textContent = record.length || '';
-              if (savedValues[6]) savedValues[6].textContent = record.instructions || '';
-              if (savedValues[7]) savedValues[7].textContent = record.next || '';
-            }
+             var grid = document.querySelector('#recordsBody .form-grid');
+             if (!grid) return;
+             var savedValues = grid.querySelectorAll('.saved-value');
+             // Clear first
+             savedValues.forEach(function(s) { s.textContent = ''; });
+             
+             var record = (Array.isArray(data) && data.length > 0) ? data[0] : null;
+             
+             if (record) {
+               if (savedValues[0]) savedValues[0].textContent = record.visit || '';
+               if (savedValues[1]) savedValues[1].textContent = record.age || '';
+               if (savedValues[2]) savedValues[2].textContent = record.weight || '';
+               if (savedValues[3]) savedValues[3].textContent = record.head || '';
+               if (savedValues[4]) savedValues[4].textContent = record.chest || '';
+               if (savedValues[5]) savedValues[5].textContent = record.length || '';
+               if (savedValues[6]) savedValues[6].textContent = record.instructions || '';
+               if (savedValues[7]) savedValues[7].textContent = record.next || ''; 
+             }
           })
           .catch(function(err) {
             console.error('Error fetching records:', err);
-
+            // Fallback to localStorage for demo purposes if API fails
             var records = JSON.parse(localStorage.getItem('records') || '[]');
             var found = records.find(function(r) { return r.visit === date; });
             var grid = document.querySelector('#recordsBody .form-grid');
             if (!grid) return;
             var savedValues = grid.querySelectorAll('.saved-value');
-            savedValues.forEach(function(s) { s.textContent = ''; });
-
+             savedValues.forEach(function(s) { s.textContent = ''; });
             if (found) {
-              if (savedValues[0]) savedValues[0].textContent = found.visit || '';
-              if (savedValues[1]) savedValues[1].textContent = found.age || '';
-              if (savedValues[2]) savedValues[2].textContent = found.weight || '';
-              if (savedValues[3]) savedValues[3].textContent = found.head || '';
-              if (savedValues[4]) savedValues[4].textContent = found.chest || '';
-              if (savedValues[5]) savedValues[5].textContent = found.length || '';
-              if (savedValues[6]) savedValues[6].textContent = found.notes || found.instructions || '';
-              if (savedValues[7]) savedValues[7].textContent = found.next || found.nextVisit || '';
+               if (savedValues[0]) savedValues[0].textContent = found.visit || '';
+               if (savedValues[1]) savedValues[1].textContent = found.age || '';
+               if (savedValues[2]) savedValues[2].textContent = found.weight || '';
+               if (savedValues[3]) savedValues[3].textContent = found.head || '';
+               if (savedValues[4]) savedValues[4].textContent = found.chest || '';
+               if (savedValues[5]) savedValues[5].textContent = found.length || '';
+               if (savedValues[6]) savedValues[6].textContent = found.notes || found.instructions || '';
+               if (savedValues[7]) savedValues[7].textContent = found.next || found.nextVisit || '';
             }
           });
       });
